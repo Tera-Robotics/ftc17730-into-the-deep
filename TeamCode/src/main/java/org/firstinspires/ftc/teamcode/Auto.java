@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.geometry.Pose2d;
 import com.arcrobotics.ftclib.geometry.Rotation2d;
 import com.arcrobotics.ftclib.purepursuit.Path;
@@ -9,31 +8,22 @@ import com.arcrobotics.ftclib.purepursuit.actions.InterruptAction;
 import com.arcrobotics.ftclib.purepursuit.waypoints.GeneralWaypoint;
 import com.arcrobotics.ftclib.purepursuit.waypoints.InterruptWaypoint;
 import com.arcrobotics.ftclib.purepursuit.waypoints.StartWaypoint;
-import com.outoftheboxrobotics.photoncore.Photon;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.util.List;
 
-@Photon
-@Autonomous(name = "Auto", group = "A", preselectTeleOp = "")
+@Autonomous(name = "Auto", group = "into-the-deep", preselectTeleOp = "")
 public class Auto extends OpMode {
     private IMU imu_IMU;
     private DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private List<LynxModule> allHubs;
     private ElapsedTime elapsedtime;
-
-    private PIDFController lfDrivePIDF = new PIDFController(10,0,0,0);
-    private PIDFController lbDrivePIDF = new PIDFController(10,0,0,0);
-    private PIDFController rfDrivePIDF = new PIDFController(10,0,0,0);
-    private PIDFController rbDrivePIDF = new PIDFController(10,0,0,0);
+    Localization localization = new Localization(0, 0, 0);
 
     @Override
     public void init() {
@@ -52,7 +42,6 @@ public class Auto extends OpMode {
         rightFront = hardwareMap.get(DcMotorEx.class, "frontright");
 
         elapsedtime.reset();
-
         Waypoint p1 = new StartWaypoint(new Pose2d(0,0, new Rotation2d(0)));
         Waypoint p2 = new GeneralWaypoint(20, 0);
 
@@ -82,7 +71,10 @@ public class Auto extends OpMode {
         // after the first time, it won't actually send new commands
 
 
-        telemetry.addData("Motor Position", leftBack.getCurrentPosition());
+        telemetry.addData("leftBackDrive", leftBack.getCurrentPosition());
+        telemetry.addData("leftFrontDrive", leftFront.getCurrentPosition());
+        telemetry.addData("rightBackDrive", rightBack.getCurrentPosition());
+        telemetry.addData("rightFrontDrive", rightFront.getCurrentPosition());
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
         elapsedtime.reset();
     }
