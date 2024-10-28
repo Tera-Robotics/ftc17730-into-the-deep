@@ -1,19 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.arcrobotics.ftclib.geometry.Pose2d;
-import com.arcrobotics.ftclib.geometry.Rotation2d;
-import com.arcrobotics.ftclib.purepursuit.Path;
-import com.arcrobotics.ftclib.purepursuit.Waypoint;
-import com.arcrobotics.ftclib.purepursuit.actions.InterruptAction;
-import com.arcrobotics.ftclib.purepursuit.waypoints.GeneralWaypoint;
-import com.arcrobotics.ftclib.purepursuit.waypoints.InterruptWaypoint;
-import com.arcrobotics.ftclib.purepursuit.waypoints.StartWaypoint;
+
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.purepursuit.PurePursuitController;
+import org.firstinspires.ftc.teamcode.purepursuit.PurePursuitPath;
 
 import java.util.List;
 
@@ -42,23 +38,6 @@ public class Auto extends OpMode {
         rightFront = hardwareMap.get(DcMotorEx.class, "frontright");
 
         elapsedtime.reset();
-        Waypoint p1 = new StartWaypoint(new Pose2d(0,0, new Rotation2d(0)));
-        Waypoint p2 = new GeneralWaypoint(20, 0);
-
-        Waypoint p4 = new InterruptWaypoint(
-                30, 0, 0.5,
-                0.3, 1,
-                0, 0, new InterruptAction() {
-            @Override
-            public void doAction() {
-
-            }
-        }
-        );
-        // we are using the waypoints we made in the above examples
-        Path m_path = new Path(p1, p2);
-
-        m_path.init(); // initialize the path
     }
 
     @Override
@@ -77,9 +56,5 @@ public class Auto extends OpMode {
         telemetry.addData("rightFrontDrive", rightFront.getCurrentPosition());
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
         elapsedtime.reset();
-    }
-
-    private void DriveStraigh() {
-
     }
 }
