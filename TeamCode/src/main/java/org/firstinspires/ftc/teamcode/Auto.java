@@ -6,10 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.purepursuit.PurePursuitController;
-import org.firstinspires.ftc.teamcode.purepursuit.PurePursuitPath;
 
 import java.util.List;
 
@@ -20,7 +18,7 @@ public class Auto extends OpMode {
     private List<LynxModule> allHubs;
     private ElapsedTime elapsedtime;
     Localization localization = new Localization(0, 0, 0);
-
+    PIDFCoefficients myPIDF = new PIDFCoefficients(0,0,0,1);
     @Override
     public void init() {
         elapsedtime = new ElapsedTime();
@@ -46,9 +44,7 @@ public class Auto extends OpMode {
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
-
         // after the first time, it won't actually send new commands
-
 
         telemetry.addData("leftBackDrive", leftBack.getCurrentPosition());
         telemetry.addData("leftFrontDrive", leftFront.getCurrentPosition());

@@ -8,8 +8,8 @@ import java.util.concurrent.Executors;
 
 public class KalmanFilterEncoders {
     // Define the matrices needed for the Kalman filter
-    private SimpleMatrix A; // State transition matrix
-    private SimpleMatrix B; // Control matrix (not used)
+    private SimpleMatrix F; // State transition matrix
+    //private SimpleMatrix B; // Control matrix (not used)
     private SimpleMatrix C; // Measurement matrix
     private SimpleMatrix Q; // Process noise covariance matrix
     private SimpleMatrix R; // Measurement noise covariance matrix
@@ -22,10 +22,10 @@ public class KalmanFilterEncoders {
         this.x = new SimpleMatrix(new DMatrixRMaj(initialEncoderValues.length, 1, true, initialEncoderValues));
 
         // Initialize the state transition matrix A as an identity matrix
-        this.A = SimpleMatrix.identity(4);
+        this.F = SimpleMatrix.identity(4);
 
         // Initialize B as a zero matrix (no control input)
-        this.B = new SimpleMatrix(4, 1);
+        //this.B = new SimpleMatrix(4, 1);
 
         // Measurement matrix C as an identity matrix
         this.C = SimpleMatrix.identity(4);
@@ -45,10 +45,10 @@ public class KalmanFilterEncoders {
 
     public void predict() {
         // Project the state forward: x = A * x
-        x = A.mult(x);
+        x = F.mult(x);
 
         // Project the error covariance forward: P = A * P * A' + Q
-        P = A.mult(P).mult(A.transpose()).plus(Q);
+        P = F.mult(P).mult(F.transpose()).plus(Q);
     }
 
     private ExecutorService executor = Executors.newSingleThreadExecutor();
