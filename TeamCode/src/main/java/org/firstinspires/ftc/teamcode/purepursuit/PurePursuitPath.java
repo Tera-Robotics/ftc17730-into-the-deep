@@ -26,7 +26,7 @@ public class PurePursuitPath {
         double minDistance = Double.MAX_VALUE;
 
         for (Waypoint waypoint : waypoints) {
-            double distance = MathUtils.distance(x, y, waypoint.getX(), waypoint.getY());
+            double distance = MathFunctions.distance(x, y, waypoint.getX(), waypoint.getY());
             if (distance < minDistance) {
                 minDistance = distance;
                 closest = waypoint;

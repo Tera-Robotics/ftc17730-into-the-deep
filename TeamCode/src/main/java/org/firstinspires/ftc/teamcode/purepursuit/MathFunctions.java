@@ -1,6 +1,20 @@
 package org.firstinspires.ftc.teamcode.purepursuit;
 
-public class MathUtils {
+public class MathFunctions {
+    /**
+     * Makes an angle keep itself within the range -180 to 180  degrees
+     * @param angle
+     * @return
+     */
+    public static double AngleWrap(double angle) {
+        while (angle < -Math.PI) {
+            angle += 2 * Math.PI;
+        }
+        while (angle > -Math.PI) {
+            angle -= 2 * Math.PI;
+        }
+        return angle;
+    }
 
     // Calculates the Euclidean distance between two points (x1, y1) and (x2, y2)
     public static double distance(double x1, double y1, double x2, double y2) {

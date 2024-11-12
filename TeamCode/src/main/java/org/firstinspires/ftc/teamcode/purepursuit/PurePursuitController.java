@@ -22,7 +22,7 @@ public class PurePursuitController {
         Waypoint lookaheadPoint = null;
 
         for (Waypoint waypoint : path.getWaypoints()) {
-            double distance = MathUtils.distance(currentX, currentY, waypoint.getX(), waypoint.getY());
+            double distance = MathFunctions.distance(currentX, currentY, waypoint.getX(), waypoint.getY());
 
             // Check if the waypoint is within the lookahead distance
             if (distance > lookaheadDistance) {
@@ -42,8 +42,8 @@ public class PurePursuitController {
             return new double[]{0, 0, 0, 0};
         }
 
-        double targetAngle = MathUtils.angleBetweenPoints(currentX, currentY, lookahead.getX(), lookahead.getY());
-        double angleDifference = MathUtils.normalizeAngle(targetAngle - currentHeading);
+        double targetAngle = MathFunctions.angleBetweenPoints(currentX, currentY, lookahead.getX(), lookahead.getY());
+        double angleDifference = MathFunctions.normalizeAngle(targetAngle - currentHeading);
 
         double speed = lookahead.getHeading();
         double turnAdjustment = angleDifference * 0.5; // Tuning factor for turn control
