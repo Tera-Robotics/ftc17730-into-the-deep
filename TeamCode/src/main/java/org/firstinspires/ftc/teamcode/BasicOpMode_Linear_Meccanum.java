@@ -16,12 +16,13 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.List;
+import java.util.Locale;
 
 @Config
 @TeleOp(name="TeleOp OpMode", group="Linear OpMode")
 public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
-    private List<LynxModule> allHubs;
     private IMU imu;
+    @SuppressWarnings("FieldMayBeFinal")
     private ElapsedTime runtime = new ElapsedTime();
     public float HEADING_GAIN = 0.45f;  // Gain for heading correction
     float x,y,turn;
@@ -29,7 +30,8 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
     double denominator;
     double frontLeftPower, backLeftPower, frontRightPower, backRightPower;
     double targetHeading = 0.0;
-    double armTargetPos = 0;
+    int armTargetPos = 0;
+    int armPreviousPosition = 0;
     public static double n1 = 0.0085;
     public static double n2 = 0;
     public static double n3 = 0.00005;
@@ -37,8 +39,9 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
     CustomPIDFController PIDF = new CustomPIDFController(n1,n2,n3,n4);
     public static int SLIDER_EXTENDED = 2300;
     public static int SLIDER_RETRACTED = 0;
+
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         imu = hardwareMap.get(IMU.class, "imu");
         DcMotorEx frontLeft = hardwareMap.get(DcMotorEx .class, "lfDriveMotor");
         DcMotorEx backLeft = hardwareMap.get(DcMotorEx.class, "lbDriveMotor");
@@ -82,7 +85,7 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
         imu.initialize(myIMUparameters);
         imu.resetYaw();
 
-        allHubs = hardwareMap.getAll(LynxModule.class);
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
@@ -91,11 +94,6 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
         runtime.reset();
 
         while (opModeIsActive()) {
-            /*
-            for (LynxModule hub : allHubs) {
-                hub.clearBulkCache();
-            }
-            */
             if (gamepad1.x) {
                 servoClaw1.setPosition(1.0);
                 servoClaw2.setPosition(0.0);
@@ -146,6 +144,17 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
                 elevatorMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
             //ARM
+            armMotor.setPower(1);
+            if (gamepad2.left_stick_y > 0.2) {
+                armTargetPos += 1;
+                armMotor.setTargetPosition(armTargetPos);
+            } else if (gamepad2.left_stick_y < -0.2) {
+                armTargetPos -= 1;
+                armMotor.setTargetPosition(armTargetPos);
+            } else {
+                armMotor.setTargetPosition(armPreviousPosition);
+                armPreviousPosition = armMotor.getCurrentPosition();
+            }/*
             if (gamepad2.left_stick_y > 0.2) {
                 armTargetPos += 1;
             } else if (gamepad2.left_stick_y < -0.2) {
@@ -157,7 +166,7 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             }
             if (armMotor.isOverCurrent()) {
                 armMotor.setPower(0);
-            }
+            }*/
 
             //MOVEMENT
             x = gamepad1.left_stick_x;
@@ -171,23 +180,27 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             if (turn > 0.1 || turn < -0.1) {
                 targetHeading = botHeading;
             } else if (x > 0.1 || x < -0.1) {
-                frontLeftPower = ((y + x) * rotationCorrection) / denominator;
-                backLeftPower = ((y - x) * rotationCorrection) / denominator;
-                frontRightPower = ((y - x) * -rotationCorrection) / denominator;
-                backRightPower = ((y + x) * -rotationCorrection) / denominator;
+                frontLeftPower  = (x * rotationCorrection);
+                backLeftPower   = (x * rotationCorrection);
+                frontRightPower = (x * -rotationCorrection);
+                backRightPower  = (x * -rotationCorrection);
             } else {
                 frontLeftPower   = (y + x + turn) / denominator;
                 backLeftPower    = (y - x + turn) / denominator;
                 frontRightPower  = (y - x - turn) / denominator;
                 backRightPower   = (y + x - turn) / denominator;
             }
-            double powerDivision = 1.3;
+            frontLeftPower = Range.clip(frontLeftPower, -1, 1);
+            backLeftPower = Range.clip(backLeftPower, -1, 1);
+            frontRightPower = Range.clip(frontRightPower, -1, 1);
+            backRightPower = Range.clip(backRightPower, -1, 1);
+            double powerDivision = 1.2;
             frontLeft.setPower(frontLeftPower/powerDivision);
             backLeft.setPower(backLeftPower/powerDivision);
             frontRight.setPower(frontRightPower/powerDivision);
             backRight.setPower(backRightPower/powerDivision);
 
-            String powersOfMotors = String.format("LeftFront: %.2f RightFront: %.2f LeftBack %.2f RightBack %.2f", frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+            String powersOfMotors = String.format(Locale.getDefault(), "LeftFront: %.2f RightFront: %.2f LeftBack %.2f RightBack %.2f", frontLeftPower, frontRightPower, backLeftPower, backRightPower);
             telemetry.addLine(powersOfMotors);
             telemetry.addData("Target Heading", targetHeading);
             telemetry.addData("Current Heading", botHeading);
@@ -195,14 +208,13 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             telemetry.addData("frontLeftPower", frontLeftPower);
             telemetry.addData("backRightPower", backRightPower);
             telemetry.addData("Rotation Correction", rotationCorrection);
-            telemetry.addData("PIDF", PIDFPower);
+            //telemetry.addData("PIDF", PIDFPower);
             telemetry.addData("armMotor Position", armMotor.getCurrentPosition());
             telemetry.addData("ArmPower", armMotor.getPower());
             telemetry.addData("Loop Times", runtime.milliseconds());
             runtime.reset();
             telemetry.update(); //Remember to update the telemetry or nothing is going to show
             previousBotHeading = botHeading;
-
         }
     }
     public double getHeading() {
