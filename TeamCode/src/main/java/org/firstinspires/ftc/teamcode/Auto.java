@@ -6,8 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.purepursuit.Waypoint;
 
 import java.util.List;
 
@@ -18,7 +19,10 @@ public class Auto extends OpMode {
     private List<LynxModule> allHubs;
     private ElapsedTime elapsedtime;
     Localization localization = new Localization(0, 0, 0);
-    PIDFCoefficients myPIDF = new PIDFCoefficients(0,0,0,1);
+    Waypoint w1 = new Waypoint(1,0,0);
+    Waypoint w2 = new Waypoint(1,1,0);
+    Waypoint w3 = new Waypoint(0,1,0);
+    Waypoint w4 = new Waypoint(0,0,0);
     @Override
     public void init() {
         elapsedtime = new ElapsedTime();
@@ -30,10 +34,10 @@ public class Auto extends OpMode {
         }
 
         imu_IMU = hardwareMap.get(IMU.class, "imu");
-        leftFront = hardwareMap.get(DcMotorEx.class, "frontleft");
-        leftBack = hardwareMap.get(DcMotorEx.class, "backleft");
-        rightBack = hardwareMap.get(DcMotorEx.class, "backright");
-        rightFront = hardwareMap.get(DcMotorEx.class, "frontright");
+        leftFront = hardwareMap.get(DcMotorEx .class, "lfDriveMotor");
+        leftBack = hardwareMap.get(DcMotorEx.class, "lbDriveMotor");
+        rightBack = hardwareMap.get(DcMotorEx.class, "rbDriveMotor");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rfDriveMotor");
 
         elapsedtime.reset();
     }
@@ -44,7 +48,8 @@ public class Auto extends OpMode {
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
         }
-        // after the first time, it won't actually send new commands
+
+        double power = Math.hypot(w1.getX(), w1.getY());
 
         telemetry.addData("leftBackDrive", leftBack.getCurrentPosition());
         telemetry.addData("leftFrontDrive", leftFront.getCurrentPosition());

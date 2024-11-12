@@ -45,7 +45,7 @@ public class PurePursuitController {
         double targetAngle = MathUtils.angleBetweenPoints(currentX, currentY, lookahead.getX(), lookahead.getY());
         double angleDifference = MathUtils.normalizeAngle(targetAngle - currentHeading);
 
-        double speed = lookahead.getVelocity();
+        double speed = lookahead.getHeading();
         double turnAdjustment = angleDifference * 0.5; // Tuning factor for turn control
 
         // Simple calculation for mecanum wheel power values

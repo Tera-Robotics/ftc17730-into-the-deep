@@ -3,12 +3,12 @@ package org.firstinspires.ftc.teamcode.purepursuit;
 public class Waypoint {
     private double x;
     private double y;
-    private double velocity;
+    private double heading;
 
-    public Waypoint(double x, double y, double velocity) {
+    public Waypoint(double x, double y, double heading) {
         this.x = x;
         this.y = y;
-        this.velocity = velocity;
+        this.heading = heading;
     }
 
     // Getters for position and velocity
@@ -20,7 +20,7 @@ public class Waypoint {
         return y;
     }
 
-    public double getVelocity() {
-        return velocity;
+    public double getHeading() {
+        return heading;
     }
 }
