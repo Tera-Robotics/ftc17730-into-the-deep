@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -53,7 +52,6 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
         Servo servoClawRotation = hardwareMap.get(Servo.class, "servoClawRotation");
         Servo servoBalde = hardwareMap.get(Servo.class, "servoBalde");
 
-
         DcMotorEx armMotor = hardwareMap.get(DcMotorEx .class, "armMotor");
         DcMotorEx elevatorMotor = hardwareMap.get(DcMotorEx .class, "elevatorMotor");
 
@@ -64,14 +62,15 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         int sliderPreviousPos = elevatorMotor.getCurrentPosition();
-        elevatorMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        elevatorMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        elevatorMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         elevatorMotor.setTargetPosition(0);
-        elevatorMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        elevatorMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        lfDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        lbDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        rbDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        rfDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        lfDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        lbDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rbDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rfDrive.setDirection(DcMotorEx.Direction.REVERSE);
 
         lfDrive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         lbDrive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
@@ -127,28 +126,31 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             }
             //SLIDER
             //stick y is inverted in this variable. greater than 0.1 is  to go down and lesser than -0.1 is to go up
-            float invertStick2R = -gamepad2.right_stick_y;
+            float invertStick2R = gamepad2.right_stick_y;
             if (invertStick2R <= -0.3) {
-                elevatorMotor.setPower(0.5);
-                elevatorMotor.setTargetPosition(SLIDER_RETRACTED);
-            }else if (invertStick2R >= 0.3) {
-                elevatorMotor.setPower(1);
+
+                elevatorMotor.setPower(0.8);
                 elevatorMotor.setTargetPosition(SLIDER_EXTENDED);
+            }else if (invertStick2R >= 0.3) {
+
+                elevatorMotor.setPower(0.4);
+                elevatorMotor.setTargetPosition(SLIDER_RETRACTED);
             }else {
+
                 elevatorMotor.setTargetPosition(sliderPreviousPos);
                 elevatorMotor.setPower(1);
                 sliderPreviousPos = elevatorMotor.getCurrentPosition();
             }
             if (gamepad2.left_bumper) {
                 elevatorMotor.setTargetPosition(armMotor.getCurrentPosition()-100);
-                sleep(50);
-                elevatorMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                elevatorMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                sleep(150);
+                elevatorMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                elevatorMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
             } else if (gamepad2.right_bumper) {
                 elevatorMotor.setTargetPosition(armMotor.getCurrentPosition()+100);
-                sleep(50);
-                elevatorMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                elevatorMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                sleep(150);
+                elevatorMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                elevatorMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
             }
             //ARM
             if (gamepad2.dpad_down) {
