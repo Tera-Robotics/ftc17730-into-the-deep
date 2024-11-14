@@ -29,13 +29,14 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
     double frontLeftPower, backLeftPower, frontRightPower, backRightPower;
     double targetHeading = 0.0;
     int armTargetPos = 0;
-    int armPreviousPosition = 0;
-    public static float HEADING_GAIN = 0.0095f;  // Gain for heading correction
+    public static float HEADING_GAIN = 0.00978f;  // Gain for heading correction
+    /*
     public static double n1 = 0.0085;
     public static double n2 = 0;
     public static double n3 = 0.00005;
     public static double n4 = 0;
     CustomPIDFController PIDF = new CustomPIDFController(n1,n2,n3,n4);
+     */
     public static int SLIDER_EXTENDED = 2550;
     public static int SLIDER_RETRACTED = 0;
 
@@ -57,7 +58,7 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
 
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setTargetPosition(0);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -118,7 +119,7 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
 
             //Claw
             if (gamepad2.y) {
-                servoClawRotation.setPosition(0.222);
+                servoClawRotation.setPosition(0);
             } else if (gamepad2.a) {
                 servoClawRotation.setPosition(1);
             } else {
@@ -128,15 +129,12 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             //stick y is inverted in this variable. greater than 0.1 is  to go down and lesser than -0.1 is to go up
             float invertStick2R = gamepad2.right_stick_y;
             if (invertStick2R <= -0.3) {
-
                 elevatorMotor.setPower(0.8);
                 elevatorMotor.setTargetPosition(SLIDER_EXTENDED);
             }else if (invertStick2R >= 0.3) {
-
                 elevatorMotor.setPower(0.4);
                 elevatorMotor.setTargetPosition(SLIDER_RETRACTED);
             }else {
-
                 elevatorMotor.setTargetPosition(sliderPreviousPos);
                 elevatorMotor.setPower(1);
                 sliderPreviousPos = elevatorMotor.getCurrentPosition();
@@ -165,8 +163,8 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
                 armMotor.setPower(0.5);
                 armMotor.setPower(armTargetPos);
             }
-            double PIDFPower = PIDF.update(armTargetPos, armMotor.getCurrentPosition());
             /*
+            double PIDFPower = PIDF.update(armTargetPos, armMotor.getCurrentPosition());
             if (gamepad2.left_stick_y > 0.2) {
                 armTargetPos += 1;
             } else if (gamepad2.left_stick_y < -0.2) {
@@ -198,9 +196,9 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             backLeftPower   = Range.clip(backLeftPower  , -1, 1);
             frontRightPower = Range.clip(frontRightPower, -1, 1);
             backRightPower  = Range.clip(backRightPower , -1, 1);
-            double powerDivision = 1.2;
+            double powerDivision = 1.75;
             lfDrive.setPower(frontLeftPower/powerDivision);
-            lbDrive.setPower(backLeftPower/powerDivision);
+            lbDrive.setPower(backLeftPower/powerDivision*1.125);
             rfDrive.setPower(frontRightPower/powerDivision);
             rbDrive.setPower(backRightPower/powerDivision);
 
@@ -210,7 +208,7 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             telemetry.addData("Current Heading", botHeading);
             telemetry.addData("Heading Error", headingError);
             telemetry.addData("Rotation Correction", rotationCorrection);
-            telemetry.addData("PIDF", PIDFPower);
+            //telemetry.addData("PIDF", PIDFPower);
             telemetry.addData("armMotor Position", armMotor.getCurrentPosition());
             telemetry.addData("armMotor Target Position", armMotor.getTargetPosition());
             telemetry.addData("ArmMotor Power", armMotor.getPower());
