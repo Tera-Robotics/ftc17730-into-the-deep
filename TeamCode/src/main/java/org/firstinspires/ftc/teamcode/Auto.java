@@ -73,13 +73,13 @@ public class Auto extends OpMode {
     public void loop() {
         telemetry.clearAll();
         odometry.updatePosition();
-        currentPose = new Pose2d(odometry.getX(), odometry.getY(), odometry.getHeading());
-        Vector2d halfv = currentPose.heading.vec().times(0.5 * 9);
-        Vector2d p1 = currentPose.position.plus(halfv);
-        Vector2d p2 = p1.plus(halfv);
         float robotX = (float) odometry.getX();
         float robotY = (float) odometry.getY();
         float robotHeading = (float) odometry.getHeading();
+        currentPose = new Pose2d(robotX, robotY, robotHeading);
+        Vector2d halfv = currentPose.heading.vec().times(0.5 * 9);
+        Vector2d p1 = currentPose.position.plus(halfv);
+        Vector2d p2 = p1.plus(halfv);
         packet.fieldOverlay()
                 .setAlpha(0.4)
                 .drawImage("/dash/into-the-deep.png", 0, 0, 144, 144)
@@ -91,7 +91,7 @@ public class Auto extends OpMode {
                 .strokeLine(p1.x, p1.y, p2.x, p2.y);
         dashboard.sendTelemetryPacket(packet);
 
-        
+
 
         /*
         telemetry.addData("leftBackDrive", leftBack.getCurrentPosition());

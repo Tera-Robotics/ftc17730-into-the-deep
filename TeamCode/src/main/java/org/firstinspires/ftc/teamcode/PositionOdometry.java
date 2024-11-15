@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class PositionOdometry {
+    SimpleKalmanFilter skf1 = new SimpleKalmanFilter();
     // Robot constants
     private final double wheelRadius = 0.096; // meters (example: 7.5 cm)
     private final double wheelbaseLength = 0.26; // meters (example: distance between front and back wheels)
