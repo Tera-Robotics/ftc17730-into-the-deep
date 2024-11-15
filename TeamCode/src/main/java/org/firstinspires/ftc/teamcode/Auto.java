@@ -77,7 +77,9 @@ public class Auto extends OpMode {
         Vector2d halfv = currentPose.heading.vec().times(0.5 * 9);
         Vector2d p1 = currentPose.position.plus(halfv);
         Vector2d p2 = p1.plus(halfv);
-        //.drawImage("https://drive.google.com/file/d/1eqV6S9xsajhLDhnBWn1BKKOlx8FuVWeZ/view?usp=sharing", 0,0,144,144)
+        float robotX = (float) odometry.getX();
+        float robotY = (float) odometry.getY();
+        float robotHeading = (float) odometry.getHeading();
         packet.fieldOverlay()
                 .setAlpha(0.4)
                 .drawImage("/dash/into-the-deep.png", 0, 0, 144, 144)
@@ -85,16 +87,20 @@ public class Auto extends OpMode {
                 .setStroke("#C9497E")
                 .drawGrid(0, 0, 144, 144, 7, 7)
                 .setStroke("#3F51B5")
-                .strokeCircle((float) odometry.getX(), (float) odometry.getY(), 9)
+                .strokeCircle(robotX, robotY, 9)
                 .strokeLine(p1.x, p1.y, p2.x, p2.y);
-        dashboard.sendTelemetryPacket(packet);/*
+        dashboard.sendTelemetryPacket(packet);
+
+        
+
+        /*
         telemetry.addData("leftBackDrive", leftBack.getCurrentPosition());
         telemetry.addData("leftFrontDrive", leftFront.getCurrentPosition());
         telemetry.addData("rightBackDrive", rightBack.getCurrentPosition());
         telemetry.addData("rightFrontDrive", rightFront.getCurrentPosition());*/
-        telemetry.addData("X Position", odometry.getX());
-        telemetry.addData("Y Position", odometry.getY());
-        telemetry.addData("Heading", odometry.getHeading());
+        telemetry.addData("X Position", robotX);
+        telemetry.addData("Y Position", robotY);
+        telemetry.addData("Heading", robotHeading);
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
         elapsedtime.reset();
         telemetry.update();

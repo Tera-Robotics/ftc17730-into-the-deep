@@ -37,8 +37,8 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
     public static double n4 = 0;
     CustomPIDFController PIDF = new CustomPIDFController(n1,n2,n3,n4);
      */
-    public static int SLIDER_EXTENDED = 2550;
-    public static int SLIDER_RETRACTED = 0;
+    public static int SLIDER_EXTENDED = 2750;
+    public static int SLIDER_RETRACTED = -15;
 
     @Override
     public void runOpMode() {
@@ -109,14 +109,13 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             }
 
             //BALDE
-            if (gamepad2.x) {
+            if (gamepad1.left_bumper) {
                 servoBalde.setPosition(1.0);
-            } else if (gamepad2.b) {
+            } else if (gamepad1.right_bumper) {
                 servoBalde.setPosition(0.0);
             } else {
                 servoBalde.setPosition(0.5);
             }
-
             //Claw
             if (gamepad2.y) {
                 servoClawRotation.setPosition(0);
@@ -127,11 +126,11 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             }
             //SLIDER
             //stick y is inverted in this variable. greater than 0.1 is  to go down and lesser than -0.1 is to go up
-            float invertStick2R = gamepad2.right_stick_y;
-            if (invertStick2R <= -0.3) {
+            //float invertStick2R = gamepad2.right_stick_y;
+            if (gamepad2.right_bumper) {
                 elevatorMotor.setPower(0.8);
                 elevatorMotor.setTargetPosition(SLIDER_EXTENDED);
-            }else if (invertStick2R >= 0.3) {
+            }else if (gamepad2.left_bumper) {
                 elevatorMotor.setPower(0.4);
                 elevatorMotor.setTargetPosition(SLIDER_RETRACTED);
             }else {
@@ -139,25 +138,20 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
                 elevatorMotor.setPower(1);
                 sliderPreviousPos = elevatorMotor.getCurrentPosition();
             }
-            if (gamepad2.left_bumper) {
-                elevatorMotor.setTargetPosition(armMotor.getCurrentPosition()-100);
-                sleep(150);
-                elevatorMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                elevatorMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            } else if (gamepad2.right_bumper) {
-                elevatorMotor.setTargetPosition(armMotor.getCurrentPosition()+100);
-                sleep(150);
+            if (gamepad2.options) {
+                elevatorMotor.setTargetPosition(armMotor.getCurrentPosition() - 100);
+                sleep(100);
                 elevatorMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
                 elevatorMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
             }
             //ARM
             if (gamepad2.dpad_down) {
                 armMotor.setPower(1 - Math.abs(armMotor.getCurrentPosition()*0.00025));
-                armTargetPos += 2;
+                armTargetPos += 3;
                 armMotor.setTargetPosition(armTargetPos);
             } else if (gamepad2.dpad_up) {
                 armMotor.setPower(0.85);
-                armTargetPos -= 2;
+                armTargetPos -= 3;
                 armMotor.setTargetPosition(armTargetPos);
             } else {
                 armMotor.setPower(0.5);
@@ -187,6 +181,7 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             rotationCorrection  = headingError * HEADING_GAIN;
             denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(turn), 1);
             if (turn > 0.1 || turn < -0.1) { targetHeading = botHeading; }
+            if (headingError > 90) {rotationCorrection *= -1;}
             frontLeftPower   = ((y + x + turn) / denominator) - rotationCorrection;
             backLeftPower    = ((y - x + turn) / denominator) - rotationCorrection;
             frontRightPower  = ((y - x - turn) / denominator) + rotationCorrection;
@@ -196,7 +191,7 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             backLeftPower   = Range.clip(backLeftPower  , -1, 1);
             frontRightPower = Range.clip(frontRightPower, -1, 1);
             backRightPower  = Range.clip(backRightPower , -1, 1);
-            double powerDivision = 1.75;
+            double powerDivision = 1.55;
             lfDrive.setPower(frontLeftPower/powerDivision);
             lbDrive.setPower(backLeftPower/powerDivision*1.125);
             rfDrive.setPower(frontRightPower/powerDivision);
