@@ -4,7 +4,6 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -14,7 +13,6 @@ public class Autonomous2 extends LinearOpMode {
     double TICKS_PER_REVOLUTION = 448;
     double WHEEL_DIAMETER = 0.96;
     IMU imu;
-    private ElapsedTime elapsedtime;
     CustomPIDFController gyroControl = new CustomPIDFController(0.00725, 0.00475, 0.01, 0.22);
     double error = 10;
     HardwareMecanum drive = new HardwareMecanum(this);
@@ -31,15 +29,29 @@ public class Autonomous2 extends LinearOpMode {
         );
         imu.initialize(myIMUparameters);
         imu.resetYaw();
-        elapsedtime = new ElapsedTime();
-        elapsedtime.reset();
+
         waitForStart();
 
-        straightFor(800);
+        straightFor(140);
         rotateUsingGyro(90);
-        straightFor(1600);
+        straightFor(1500);
+
         rotateUsingGyro(90);
-        straightFor(800);
+        rotateUsingGyro(90);
+        rotateUsingGyro(45);
+        straightBackwardsFor(150);
+        drive.servoBalde.setPosition(0);
+        sleep(1200);
+        drive.servoBalde.setPosition(0.5);
+        straightFor(600);
+        rotateUsingGyro(45);
+        straightFor(100);
+        rotateUsingGyro(90);
+        straightFor(100);
+        rotateUsingGyro(90);
+        straightFor(600);
+
+        sleep(3000);
         telemetry.addLine("Acabaste");
         telemetry.update();
 }
@@ -61,6 +73,16 @@ public class Autonomous2 extends LinearOpMode {
         drive.resetEncoders();
         while (drive.lfDrive.getCurrentPosition() < position && drive.rfDrive.getCurrentPosition() < position) {
             drive.setPowerFourWheels(0.32);
+        }
+        drive.stopMotors();
+        sleep(100);
+    }
+
+    private void straightBackwardsFor(int position) {
+        position *= -1;
+        drive.resetEncoders();
+        while (drive.lfDrive.getCurrentPosition() > position && drive.rfDrive.getCurrentPosition() > position) {
+            drive.setPowerFourWheels(-0.32);
         }
         drive.stopMotors();
         sleep(100);
@@ -101,6 +123,6 @@ public class Autonomous2 extends LinearOpMode {
     }
     public double getHeading() {
         double head = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        return head % 360;
+        return head;
     }
 }

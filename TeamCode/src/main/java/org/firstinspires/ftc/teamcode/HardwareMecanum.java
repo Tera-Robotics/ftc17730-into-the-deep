@@ -57,9 +57,12 @@ import java.util.List;
  */
 
 public class HardwareMecanum {
+    public static int SLIDER_EXTENDED = 2750;
+    public static int SLIDER_HALF_EXTENDED = 1890;
+    public static int SLIDER_RETRACTED = 0;
     /* Declare OpMode members. */
     private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
-    private Servo servoClaw1, servoClaw2, servoClawRotation, servoBalde = null;
+    public Servo servoClaw1, servoClaw2, servoClawRotation, servoBalde = null;
 
     // Define Motor and Servo objects  (Make them private so they can't be accessed externally)
     public DcMotorEx lfDrive;
@@ -98,6 +101,17 @@ public class HardwareMecanum {
         rfDrive = myOpMode.hardwareMap.get(DcMotorEx.class, "rfDriveMotor");
         armMotor   = myOpMode.hardwareMap.get(DcMotorEx.class, "armMotor");
         elevatorMotor = myOpMode.hardwareMap.get(DcMotorEx .class, "elevatorMotor");
+
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armMotor.setTargetPosition(0);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        elevatorMotor.setDirection(DcMotorEx.Direction.REVERSE);
+        elevatorMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        elevatorMotor.setTargetPosition(0);
+        elevatorMotor.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         servoClaw1 = myOpMode.hardwareMap.get(Servo.class, "servoClaw1");
         servoClaw2 = myOpMode.hardwareMap.get(Servo.class, "servoClaw2");
@@ -200,5 +214,23 @@ public class HardwareMecanum {
         offset = Range.clip(offset, -0.5, 0.5);
         leftHand.setPosition(MID_SERVO + offset);
         rightHand.setPosition(MID_SERVO - offset);
+    }
+
+    public void setElevatorMotor(int position, double power) {
+        elevatorMotor.setPower(power);
+        elevatorMotor.setTargetPosition(position);
+    }
+    public void closeClaw(){
+        servoClaw1.setPosition(1.0);
+        servoClaw2.setPosition(0.0);
+    }
+    public void openClaw() {
+        servoClaw1.setPosition(0.0);
+        servoClaw2.setPosition(1.0);
+    }
+
+    public void stopClaw() {
+        servoClaw1.setPosition(0.5);
+        servoClaw2.setPosition(0.5);
     }
 }
