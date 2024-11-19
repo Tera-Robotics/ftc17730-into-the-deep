@@ -43,7 +43,7 @@ public class PurePursuitController {
         }
 
         double targetAngle = MathFunctions.angleBetweenPoints(currentX, currentY, lookahead.getX(), lookahead.getY());
-        double angleDifference = MathFunctions.normalizeAngle(targetAngle - currentHeading);
+        double angleDifference = targetAngle - currentHeading;
 
         double speed = lookahead.getHeading();
         double turnAdjustment = angleDifference * 0.5; // Tuning factor for turn control

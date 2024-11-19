@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -14,9 +13,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.purepursuit.Waypoint;
+import org.firstinspires.ftc.teamcode.purepursuit.PurePursuitController;
+import org.firstinspires.ftc.teamcode.purepursuit.PurePursuitPath;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Autonomous(name = "Auto", group = "into-the-deep", preselectTeleOp = "TeleOp OpMode")
@@ -25,17 +24,18 @@ public class Auto extends OpMode {
     private DcMotorEx leftFront, leftBack, rightBack, rightFront;
     private List<LynxModule> allHubs;
     private ElapsedTime elapsedtime;
-    private List<Waypoint> waypoints;
-    private int currentWaypointIndex = 0;
     private PositionOdometry odometry;
     Pose2d currentPose = new Pose2d(0,0,0);
+    Pose2d startPose = new Pose2d(0, 0, 0);
     TelemetryPacket packet = new TelemetryPacket();
     FtcDashboard dashboard;
+    PurePursuitController follower;
+    double lbPower, lfPower, rbPower, rfPower;
     @Override
     public void init() {
-        telemetry.speak("Autonomous Code");
+        telemetry.speak("Autonomous");
         dashboard = FtcDashboard.getInstance();
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        //telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         elapsedtime = new ElapsedTime();
 
         // this just sets the bulk reading mode for each hub
@@ -61,17 +61,18 @@ public class Auto extends OpMode {
 
         odometry = new PositionOdometry(leftFront, leftBack, rightFront, rightBack, imu);
 
-        waypoints = new ArrayList<>();
-        waypoints.add(new Waypoint(1, 0, 0));
-        waypoints.add(new Waypoint(1, 1, 0));
-        waypoints.add(new Waypoint(0, 1, 0));
-        waypoints.add(new Waypoint(0, 0, 0));
+        PurePursuitPath path = new PurePursuitPath();
+        path.addWaypoint(1,0,0);
+        path.addWaypoint(1,1,0);
+        path.addWaypoint(0,1,0);
+        path.addWaypoint(0,0,0);
+
+        follower = new PurePursuitController(path,9);
 
         elapsedtime.reset();
     }
     @Override
     public void loop() {
-        telemetry.clearAll();
         odometry.updatePosition();
         float robotX = (float) odometry.getX();
         float robotY = (float) odometry.getY();
@@ -80,6 +81,27 @@ public class Auto extends OpMode {
         Vector2d halfv = currentPose.heading.vec().times(0.5 * 9);
         Vector2d p1 = currentPose.position.plus(halfv);
         Vector2d p2 = p1.plus(halfv);
+        follower.updatePosition(robotX, robotY, robotHeading);
+        double[] powers = follower.calculateMotorPowers();
+        lbPower = powers[0];
+        lfPower = powers[1];
+        rbPower = powers[2];
+        rfPower = powers[3];
+        //leftBack.setPower(lbPower);
+        //leftFront.setPower(lfPower);
+        //rightBack.setPower(rbPower);
+        //rightFront.setPower(rfPower);
+
+        telemetry.addData("leftBackPower", lbPower);
+        telemetry.addData("leftFrontDrive", lfPower);
+        telemetry.addData("rightBackDrive", rbPower);
+        telemetry.addData("rightFrontDrive", rfPower);
+        telemetry.addData("X Position", robotX);
+        telemetry.addData("Y Position", robotY);
+        telemetry.addData("Heading", robotHeading);
+        telemetry.addData("Loop Times", elapsedtime.milliseconds());
+        elapsedtime.reset();
+        telemetry.update();
         packet.fieldOverlay()
                 .setAlpha(0.4)
                 .drawImage("/dash/into-the-deep.png", 0, 0, 144, 144)
@@ -90,19 +112,5 @@ public class Auto extends OpMode {
                 .strokeCircle(robotX, robotY, 9)
                 .strokeLine(p1.x, p1.y, p2.x, p2.y);
         dashboard.sendTelemetryPacket(packet);
-
-
-
-        /*
-        telemetry.addData("leftBackDrive", leftBack.getCurrentPosition());
-        telemetry.addData("leftFrontDrive", leftFront.getCurrentPosition());
-        telemetry.addData("rightBackDrive", rightBack.getCurrentPosition());
-        telemetry.addData("rightFrontDrive", rightFront.getCurrentPosition());*/
-        telemetry.addData("X Position", robotX);
-        telemetry.addData("Y Position", robotY);
-        telemetry.addData("Heading", robotHeading);
-        telemetry.addData("Loop Times", elapsedtime.milliseconds());
-        elapsedtime.reset();
-        telemetry.update();
     }
 }

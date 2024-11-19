@@ -15,7 +15,7 @@ public class CustomPIDFController {
         this.Ki = newKi;
         this.Kf = newKf;
     }
-    public double update(double target, int currentPosition) {
+    public double update(double target, double currentPosition) {
         error = target - currentPosition;
         derivative = (error - lastError) / timer.seconds();
         integralSum += (error * timer.seconds());

@@ -2,8 +2,22 @@ package org.firstinspires.ftc.teamcode.purepursuit;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Trajectory;
+import com.acmerobotics.roadrunner.Vector2d;
+
+import java.util.List;
 
 public class PurePursuit {
+    static class Robot {
+        Vector2d position;
+        double heading; // In radians
+        double lookaheadDistance;
+
+        Robot(double x, double y, double heading, double lookaheadDistance) {
+            this.position = new Vector2d(x, y);
+            this.heading = heading;
+            this.lookaheadDistance = lookaheadDistance;
+        }
+    }
     private final Trajectory trajectory;
     private final double lookaheadDistance;
 
@@ -11,7 +25,38 @@ public class PurePursuit {
         this.trajectory = trajectory;
         this.lookaheadDistance = lookaheadDistance;
     }
+    static Vector2d findLookaheadPoint(Robot robot, List<Vector2d> path) {
+        for (int i = 0; i < path.size() - 1; i++) {
+            Vector2d start = path.get(i);
+            Vector2d end = path.get(i + 1);
 
+            // Vector math to find intersection
+            double dx = end.x - start.x;
+            double dy = end.y - start.y;
+
+            double fx = start.x - robot.position.x;
+            double fy = start.y - robot.position.y;
+
+            double a = dx * dx + dy * dy;
+            double b = 2 * (fx * dx + fy * dy);
+            double c = fx * fx + fy * fy - robot.lookaheadDistance * robot.lookaheadDistance;
+
+            double discriminant = b * b - 4 * a * c;
+            if (discriminant >= 0) {
+                discriminant = Math.sqrt(discriminant);
+                double t1 = (-b - discriminant) / (2 * a);
+                double t2 = (-b + discriminant) / (2 * a);
+
+                if (t1 >= 0 && t1 <= 1) {
+                    return new Vector2d(start.x + t1 * dx, start.y + t1 * dy);
+                }
+                if (t2 >= 0 && t2 <= 1) {
+                    return new Vector2d(start.x + t2 * dx, start.y + t2 * dy);
+                }
+            }
+        }
+        return null; // No valid lookahead point
+    }
     public double lineCircleIntersection(Pose2d currentPos, Waypoint pt1,Waypoint pt2,double lookAheadDis) {
         double currentX = currentPos.position.x;
         double currentY = currentPos.position.y;
