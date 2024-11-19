@@ -174,7 +174,7 @@ public class HardwareMecanum {
     public void setDrivePower(double leftFrontWheel, double leftBackWheel, double rightFrontWheel, double rightBackWheel) {
         // Output the values to the motor drives.
         lfDrive.setPower(leftFrontWheel);
-        lbDrive.setPower(leftBackWheel);
+        lbDrive.setPower(leftBackWheel*0.825);
         rfDrive.setPower(rightFrontWheel);
         rbDrive.setPower(rightBackWheel);
     }

@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class Autonomous2 extends LinearOpMode {
     double TICKS_PER_REVOLUTION = 448;
     double WHEEL_DIAMETER = 0.96;
+    double DEFAULT_POWER = 0.34;
     IMU imu;
     CustomPIDFController gyroControl = new CustomPIDFController(0.00725, 0.00475, 0.01, 0.22);
     double error = 10;
@@ -32,24 +33,39 @@ public class Autonomous2 extends LinearOpMode {
 
         waitForStart();
 
-        straightFor(140);
+        straightFor(300, DEFAULT_POWER);
         rotateUsingGyro(90);
-        straightFor(1500);
+        straightFor(1380, DEFAULT_POWER+0.1);
 
         rotateUsingGyro(90);
         rotateUsingGyro(90);
         rotateUsingGyro(45);
-        straightBackwardsFor(150);
         drive.servoBalde.setPosition(0);
-        sleep(1200);
+        sleep(1100);
+        drive.servoBalde.setPosition(1);
+        sleep(700);
+        drive.servoBalde.setPosition(0);
+        sleep(700);
         drive.servoBalde.setPosition(0.5);
-        straightFor(600);
-        rotateUsingGyro(45);
-        straightFor(100);
-        rotateUsingGyro(90);
-        straightFor(100);
-        rotateUsingGyro(90);
-        straightFor(600);
+        straightBackwardsFor(150, DEFAULT_POWER);
+        straightFor(1000, DEFAULT_POWER);
+        rotateUsingGyro(55);
+        straightFor(700, DEFAULT_POWER);
+        rotateUsingGyro(-30);
+//        straightBackwardsFor(250, DEFAULT_POWER);
+//        rotateUsingGyro(-15);
+        straightBackwardsFor(1500, DEFAULT_POWER+0.12);
+
+        //DONT CHANGE THE CODE ABOVE
+
+
+        straightFor(1300, 0.5);
+        rotateUsingGyro(30);
+        straightFor(300, DEFAULT_POWER+0.15);
+        rotateUsingGyro(-35);
+        straightBackwardsFor(600, DEFAULT_POWER);
+        rotateUsingGyro(15);
+        straightBackwardsFor(1200, 0.7);
 
         sleep(3000);
         telemetry.addLine("Acabaste");
@@ -62,27 +78,27 @@ public class Autonomous2 extends LinearOpMode {
             double currentHeading = getHeading();
             double correction = gyroControl.update(angle, currentHeading);
             error = angle - currentHeading;
-            correction = Range.clip(correction, -0.3,0.3);
+            correction = Range.clip(correction, -0.32,0.32);
             if (angle > 0) { correction *= -1; }
             drive.setDrivePower(correction, correction, -correction, -correction);
         }
         drive.stopMotors();
         sleep(100);
     }
-    private void straightFor(int position) {
+    private void straightFor(int position, double power) {
         drive.resetEncoders();
         while (drive.lfDrive.getCurrentPosition() < position && drive.rfDrive.getCurrentPosition() < position) {
-            drive.setPowerFourWheels(0.32);
+            drive.setPowerFourWheels(0.34);
         }
         drive.stopMotors();
         sleep(100);
     }
 
-    private void straightBackwardsFor(int position) {
+    private void straightBackwardsFor(int position, double power) {
         position *= -1;
         drive.resetEncoders();
         while (drive.lfDrive.getCurrentPosition() > position && drive.rfDrive.getCurrentPosition() > position) {
-            drive.setPowerFourWheels(-0.32);
+            drive.setPowerFourWheels(-power);
         }
         drive.stopMotors();
         sleep(100);
