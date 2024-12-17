@@ -118,9 +118,9 @@ public class BasicOpMode_Linear_Meccanum extends LinearOpMode {
             }
             //Claw
             if (gamepad2.y) {
-                servoClawRotation.setPosition(0);
+                servoClawRotation.setPosition(0.15);
             } else if (gamepad2.a) {
-                servoClawRotation.setPosition(1);
+                servoClawRotation.setPosition(0.9);
             } else {
                 servoClawRotation.setPosition(0.7);
             }
