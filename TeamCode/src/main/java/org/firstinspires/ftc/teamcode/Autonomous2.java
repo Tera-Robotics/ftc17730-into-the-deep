@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class Autonomous2 extends LinearOpMode {
     double TICKS_PER_REVOLUTION = 448;
     double WHEEL_DIAMETER = 0.96;
-    double DEFAULT_POWER = 0.34;
+    double DEFAULT_POWER = 0.3452222;
     IMU imu;
     CustomPIDFController gyroControl = new CustomPIDFController(0.00725, 0.00475, 0.01, 0.22);
     double error = 10;
@@ -35,7 +35,7 @@ public class Autonomous2 extends LinearOpMode {
 
         straightFor(300, DEFAULT_POWER);
         rotateUsingGyro(90);
-        straightFor(1380, DEFAULT_POWER+0.1);
+        straightFor(1280, DEFAULT_POWER+0.18);
 
         rotateUsingGyro(90);
         rotateUsingGyro(90);
@@ -45,28 +45,28 @@ public class Autonomous2 extends LinearOpMode {
         drive.servoBalde.setPosition(1);
         sleep(700);
         drive.servoBalde.setPosition(0);
-        sleep(700);
+        sleep(400);
         drive.servoBalde.setPosition(0.5);
         straightBackwardsFor(150, DEFAULT_POWER);
-        straightFor(1000, DEFAULT_POWER);
+        straightFor(925, DEFAULT_POWER+0.15);
         rotateUsingGyro(55);
-        straightFor(700, DEFAULT_POWER);
+        straightFor(700, DEFAULT_POWER+0.15);
         rotateUsingGyro(-30);
-//        straightBackwardsFor(250, DEFAULT_POWER);
-//        rotateUsingGyro(-15);
-        straightBackwardsFor(1500, DEFAULT_POWER+0.12);
+        straightBackwardsFor(1480, DEFAULT_POWER+0.05);
 
         //DONT CHANGE THE CODE ABOVE
 
-
-        straightFor(1300, 0.5);
+        straightFor(1300, 0.58);
         rotateUsingGyro(30);
-        straightFor(300, DEFAULT_POWER+0.15);
+        straightFor(300, DEFAULT_POWER+0.16);
         rotateUsingGyro(-35);
         straightBackwardsFor(600, DEFAULT_POWER);
         rotateUsingGyro(15);
-        straightBackwardsFor(1200, 0.7);
+        straightBackwardsFor(1100, 0.7);
 
+        straightFor(1500,0.55);
+        rotateUsingGyro(-10);
+        drive.setDrivePower(-0.58, -0.58, -0.50, -0.50);
         sleep(3000);
         telemetry.addLine("Acabaste");
         telemetry.update();
